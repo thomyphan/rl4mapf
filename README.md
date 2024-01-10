@@ -1,2 +1,2 @@
-# rl4mapf
-Reinforcement Learning for Multi-Agent Path Finding
+# Reinforcement Learning Techniques for Multi-Agent Path Finding
+To be done
