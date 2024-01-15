@@ -41,4 +41,5 @@ The completion rates are printed on the command line and can be redirected into 
 ## References
 
 [1] T. Phan et al., "Confidence-Based Curriculum Learning for Multi-Agent Path Finding", AAMAS 2024 (To appear)
+
 [2] G. Sartoretti et al., *"PRIMAL: Pathfinding via Reinforcement and Imitation Multi-Agent Learning"*, RA-L 2019
