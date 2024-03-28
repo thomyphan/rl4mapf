@@ -15,7 +15,7 @@ mkdir primal_test_envs
 Are generated for each training run in `run_training.py` using `cactus.env.env_generator`.
 
 ### Test maps
-Go to the Google Drive referenced by the PRIMAL Github repository. Download the archive with all PRIMAL test maps and unpack it in `instances\primal_test_envs`
+Go to the Google Drive referenced by the PRIMAL Github repository. Download the archive with all PRIMAL test maps [2] and unpack it in `instances/primal_test_envs`
 
 ## Running the Code
 
@@ -27,7 +27,7 @@ Run training of all MARL algorithms in the paper with (creates a folder mit `res
 python run_training.py
 ```
 
-The command will create a folder `output\` with named result folders per MARL algorithm.
+The command will create a folder `output/` with named result folders per MARL algorithm.
 
 ### Test
 
@@ -40,6 +40,6 @@ The completion rates are printed on the command line and can be redirected into 
 
 ## References
 
-[1] T. Phan et al., "Confidence-Based Curriculum Learning for Multi-Agent Path Finding", AAMAS 2024 (To appear)
+[1] T. Phan et al., *"Confidence-Based Curriculum Learning for Multi-Agent Path Finding"*, AAMAS 2024 (To appear)
 
 [2] G. Sartoretti et al., *"PRIMAL: Pathfinding via Reinforcement and Imitation Multi-Agent Learning"*, RA-L 2019
