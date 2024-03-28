@@ -4,6 +4,7 @@ from cactus.utils import get_param_or_default, assertEquals, assertContains
 from cactus.constants import *
 from os.path import join
 import random
+import cactus.env.env_generator as env_generator
 
 DEFAULT_OBSTACLES = [
         [1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
@@ -41,18 +42,13 @@ def load_obstacles(filename):
             height = len(line.strip())
         return obstacles, width, height
 
-def get_primal_training_map_names(map_samples=10):
-    filename_pattern = "primal-8_agents_{}_size_{}_density_id_{}_environment"
-    map_names = []
-    map_ids = [i for i in range(100)]
+def generate_training_maps(params):
+    envs = []
     for size in [10, 10, 40, 80]:
         for density in [0, 0.1, 0.2, 0.3]:
-            random_map_ids = random.sample(map_ids, k=map_samples)
-            if density == 0:
-                random_map_ids = [random_map_ids[0]]
-            for map_id in random_map_ids:
-                map_names.append(filename_pattern.format(size, density, map_id))
-    return map_names
+            env,_ = env_generator.generate_mapf_gridworld(params[ENV_NR_AGENTS], size, density, params)
+            envs.append(env)
+    return envs
 
 def make_test_map(params):
     assertContains(params, MAP_NAME)

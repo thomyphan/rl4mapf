@@ -94,7 +94,7 @@ def run_training(envs, test_envs, controller, params):
             training_time = total_time - prev_total_time
             prev_total_time = total_time
             result = test_run(test_envs, controller, params)
-            print(f"Finished epoch {i} ({params[ALGORITHM_NAME]}, {params[CURRICULUM_NAME]}, {params[MAP_NAME]}, {params[ENV_NR_AGENTS]} agents):")
+            print(f"Finished epoch {i} ({params[ALGORITHM_NAME]}, {params[CURRICULUM_NAME]}, {params[ENV_NR_AGENTS]} agents):")
             print(f"- Success rate: {result[SUCCESS_RATE]}")
             print(f"- Completion rate: {result[COMPLETION_RATE]}")
             print(f"- Time elapsed: {training_time} seconds")

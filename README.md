@@ -12,7 +12,7 @@ mkdir primal_envs
 mkdir primal_test_envs
 ```
 ### Training maps
-Generate training maps with the PRIMAL [2] Github repository and save them in `instances\primal_envs`.
+Are generated for each training run in `run_training.py` using `cactus.env.env_generator`.
 
 ### Test maps
 Go to the Google Drive referenced by the PRIMAL Github repository. Download the archive with all PRIMAL test maps and unpack it in `instances\primal_test_envs`

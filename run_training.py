@@ -2,6 +2,7 @@ import cactus.algorithms as algorithms
 import cactus.maps as maps
 import cactus.experiments as experiments
 import cactus.data as data
+import copy
 from cactus.constants import *
 
 nr_episodes = 1
@@ -24,8 +25,6 @@ params[VDN_MODE] = False
 params[REWARD_SHARING] = False
 params[MIXING_HIDDEN_SIZE] = 128
 
-map_names = maps.get_primal_training_map_names()
-
 def run(algorithm_name, curriculum_name):
     params[ALGORITHM_NAME] = algorithm_name
     params[CURRICULUM_NAME] = curriculum_name
@@ -34,15 +33,8 @@ def run(algorithm_name, curriculum_name):
         params[CURRICULUM_NAME] = RANDOM_CURRICULUM
     params[DIRECTORY] = f"output/{params[ENV_NR_AGENTS]}-agents_{curriculum_name}_{algorithm_name}"
     params[DIRECTORY] = data.mkdir_with_timestap(params[DIRECTORY])
-    training_envs = []
-    test_envs = []
-    print("Loading maps ...")
-    for i, map_name in enumerate(map_names):
-        params[MAP_NAME] = map_name
-        training_envs.append(maps.make(params))
-        test_envs.append(maps.make_test_map(params))
-        print(f"Loaded map {i+1}/{len(map_names)}", end='\r')
-    print("Loading maps COMPLETE!")
+    training_envs = maps.generate_training_maps(params)
+    test_envs = [copy.deepcopy(e) for e in training_envs]
     controller = algorithms.make(params)
     results = experiments.run_training(training_envs, test_envs, controller, params)
     return controller, results
