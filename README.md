@@ -8,7 +8,6 @@
 Run these commands
 ```
 cd instances
-mkdir primal_envs
 mkdir primal_test_envs
 ```
 ### Training maps
