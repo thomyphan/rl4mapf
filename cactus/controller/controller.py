@@ -121,6 +121,12 @@ class Controller(Tensorable):
         self.vdn_mode = get_param_or_default(params, VDN_MODE, False)
         self.reward_sharing = get_param_or_default(params, REWARD_SHARING, True)
         self.agent_ids = [i for i in range(self.nr_agents)]
+        self.grid_operations = self.int_zeros((NR_GRID_ACTIONS, ENV_2D))
+        self.grid_operations[WAIT]  = self.as_int_tensor([ 0,  0])
+        self.grid_operations[NORTH] = self.as_int_tensor([ 0,  1])
+        self.grid_operations[SOUTH] = self.as_int_tensor([ 0, -1])
+        self.grid_operations[WEST]  = self.as_int_tensor([-1,  0])
+        self.grid_operations[EAST]  = self.as_int_tensor([ 1,  0])
     
     def get_parameter_count(self):
         return 0

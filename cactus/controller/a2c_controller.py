@@ -1,6 +1,6 @@
 from cactus.controller.controller import Controller
 from cactus.modules.ffn_module import FFNModule
-from cactus.utils import get_param_or_default
+from cactus.utils import get_param_or_default, assertEquals
 from cactus.constants import *
 from torch.distributions import Categorical
 from os.path import join
@@ -25,6 +25,19 @@ class A2CController(Controller):
             self.critic_network = FFNModule(params)
             self.critic_parameters = self.critic_network.parameters()
             self.critic_optimizer = torch.optim.Adam(self.critic_parameters, lr=self.learning_rate)
+
+    def calculate_action_masks(self, joint_observation):
+        channels, o_size, o_size = self.observation_dim[0], self.observation_dim[1], self.observation_dim[2]
+        batch_size = joint_observation.size(0)
+        joint_observation = joint_observation.view(batch_size, self.nr_agents, channels, o_size, o_size)
+        half_size = int(self.observation_dim[-1]/2)
+        invalid_actions = self.bool_zeros([batch_size, self.nr_agents, self.nr_actions])
+        for i, delta in enumerate(self.grid_operations[GRID_ACTIONS]):
+            dx,dy = delta[0], delta[1]
+            invalid_actions[:,self.agent_ids,i] = joint_observation[:,self.agent_ids,2,half_size+dx,half_size+dy].to(torch.bool)
+        action_mask = self.float_zeros_like(invalid_actions)
+        action_mask[invalid_actions] = float('-inf')
+        return action_mask.view(-1, self.nr_actions)
 
     def get_parameter_count(self):
         nr_actor_params = sum(p.numel() for p in self.policy_network.parameters() if p.requires_grad)
@@ -56,8 +69,10 @@ class A2CController(Controller):
 
     def joint_policy(self, joint_observation):
         joint_observation = joint_observation.view(1, self.nr_agents, -1)
+        action_mask = self.calculate_action_masks(joint_observation)
         action_logits = self.policy_network(joint_observation)
-        probs = F.softmax(action_logits, dim=-1).detach()
+        assertEquals(action_mask.size(), action_logits.size())
+        probs = F.softmax(action_logits+action_mask, dim=-1).detach()
         m = Categorical(probs)
         joint_action = m.sample()
         return joint_action.view(self.nr_agents)
@@ -81,11 +96,13 @@ class A2CController(Controller):
 
     def train(self):
         obs, actions, returns, _, _ = self.memory.get_training_data(truncated=True)
+        action_mask = self.calculate_action_masks(obs)
         obs = obs.view(-1, self.policy_network.input_shape)
         actions = actions.view(-1)
         returns = returns.view(-1)
         returns = (returns - returns.mean())/(returns.std() + EPSILON)
-        probs = F.softmax(self.policy_network(obs), dim=-1)
+        action_logits = self.policy_network(obs)
+        probs = F.softmax(action_logits+action_mask, dim=-1)
         old_probs = probs.detach()
         for i in range(self.update_iterations):
             self.update_critic(obs, actions, returns)
@@ -100,5 +117,6 @@ class A2CController(Controller):
             torch.nn.utils.clip_grad_norm_(self.policy_parameters, self.grad_norm_clip)
             self.policy_optimizer.step()
             if i+1 < self.update_iterations:
-                probs = F.softmax(self.policy_network(obs), dim=-1)
+                action_logits = self.policy_network(obs)
+                probs = F.softmax(action_logits+action_mask, dim=-1)
 
